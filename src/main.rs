@@ -69,10 +69,8 @@ fn rename(item: String) -> Result<()> {
         for entry in fs::read_dir(&item)? {
             let mut file_path = entry?.path();
             if file_path.is_dir() {
-                return Result::Err(io::Error::new(
-                    io::ErrorKind::InvalidInput,
-                    "Path points to directory",
-                ));
+                println!("Element is directory, skipping");
+                continue;
             }
             inner_aux(&mut file_path)?;
         }

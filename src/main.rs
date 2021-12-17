@@ -3,20 +3,20 @@ use sha1::Digest;
 use std::{
 	env, fs,
 	io::{self, Result},
-	path::{Path, PathBuf},
+	path::Path,
 };
 
-fn main() -> Result<()> {
+fn main() {
 	let args: Vec<String> = env::args().collect();
 
 	if args.len() > 2 {
-		return handle_paths(args[2..].to_vec(), parse_cmd(&args[1]));
+		match handle_paths(args[2..].to_vec(), parse_cmd(&args[1])) {
+			Ok(()) => println!("Process finished"),
+			Err(e) => println!("{}", e.to_string()),
+		}
 	}
 
-	Err(std::io::Error::new(
-		io::ErrorKind::InvalidInput,
-		"No arguments",
-	))
+	panic!("Please consult the \"help\" command");
 }
 
 fn parse_cmd(cmd: &str) -> fn(&str) -> Result<()> {
@@ -38,6 +38,7 @@ fn run(_item: &str) -> Result<()> {
 	//     let b64 = hash.to_base64().replace("+", "-").replace("/", "_");
 	//     println!("{}: {}", &item, &b64);
 	// }
+	println!("WIP :(");
 	Ok(())
 }
 
@@ -54,12 +55,7 @@ fn handle_paths(args: Vec<String>, func: fn(&str) -> Result<()>) -> Result<()> {
 			handle_paths(
 				path.read_dir()?
 					.map(|sub_elem| {
-						sub_elem
-							.unwrap()
-							.path()
-							.into_os_string()
-							.into_string()
-							.unwrap()
+						String::from(sub_elem.expect("Cannot get file").path().to_string_lossy())
 					})
 					.collect(),
 				func.clone(),
@@ -68,7 +64,6 @@ fn handle_paths(args: Vec<String>, func: fn(&str) -> Result<()>) -> Result<()> {
 		// one day, symlinks will be supported
 		// } else if path.is_symlink() {
 		//     handle_paths(vec![path.into_os_string().into_string().unwrap()]);
-		// }
 		} else {
 			func(path.to_str().unwrap())?;
 		}
@@ -84,13 +79,21 @@ fn rename(item: &str) -> Result<()> {
 
 	io::copy(&mut file, &mut hasher)?;
 
-	let new_path = path.with_file_name(format!("{:x}", hasher.finalize()));
-	fs::rename(&path, &new_path)?;
-	println!(
-		"\nold path: {}\nnew path: {}",
-		path.to_str().unwrap(),
-		new_path.to_str().unwrap()
-	);
+	if let Some(ext) = path.extension() {
+		let new_path = path.with_file_name(format!(
+			"{:x}.{}",
+			hasher.finalize(),
+			ext.to_ascii_lowercase().to_string_lossy()
+		));
+		fs::rename(&path, &new_path)?;
+		println!(
+			"\nold path: {}\nnew path: {}",
+			path.to_str().unwrap(),
+			new_path.to_str().unwrap()
+		);
+	} else {
+		println!("{}: Could not find extension", path.to_str().unwrap());
+	}
 
 	Ok(())
 }

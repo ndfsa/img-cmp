@@ -15,8 +15,6 @@ fn main() {
 			Err(e) => println!("{}", e.to_string()),
 		}
 	}
-
-	panic!("Please consult the \"help\" command");
 }
 
 fn parse_cmd(cmd: &str) -> fn(&str) -> Result<()> {

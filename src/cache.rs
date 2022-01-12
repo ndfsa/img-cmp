@@ -14,10 +14,7 @@ pub fn clean_cache(path_list: Vec<String>) -> Result<(), Error> {
         .preproc_dct()
         .hash_alg(HashAlg::Mean)
         .to_hasher();
-    let mut file_list = match load_cache() {
-        Some(cache) => cache,
-        None => HashMap::new()
-    };
+    let mut file_list = load_cache().unwrap_or(HashMap::new());
     for elem in &path_list {
         cache_elem(&elem, &hasher, &mut file_list)?;
     }

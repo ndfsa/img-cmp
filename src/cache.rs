@@ -56,7 +56,7 @@ pub fn cache_elem(
     file_list: &mut HashMap<String, String>,
 ) -> Result<(), Error> {
     if file_list.contains_key(item) {
-        println!("{}: {}", &item.bright_green(), file_list[item]);
+        eprintln!("{}: {}", &item.bright_green(), file_list[item]);
         return Ok(());
     } else {
         return match image::open(&item) {
@@ -64,7 +64,7 @@ pub fn cache_elem(
                 let hash = hasher.hash_image(&image);
                 let b64 = hash.to_base64();
                 file_list.insert(String::from(item), String::from(&b64));
-                println!("{}: {}", &item.bright_red(), &b64);
+                eprintln!("{}: {}", &item.bright_red(), &b64);
                 return Ok(());
             }
             Err(error) => Err(Error::new(ErrorKind::Other, error.to_string())),

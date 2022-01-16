@@ -82,7 +82,7 @@ fn find_duplicates(file_list: &HashMap<String, String>) {
             for (path_j, hash_j) in &lookup {
                 if let Ok(hash2) = ImageHash::<Box<[u8]>>::from_base64(hash_j) {
                     let diff = hash1.dist(&hash2);
-                    if diff < 2 {
+                    if diff < 1 {
                         println!("{} {} {}", path_i, path_j, diff);
                     }
                 } else {

@@ -36,7 +36,7 @@ fn parse_cmd(cmd: &str, path_list: Vec<String>) -> Result<()> {
 fn run(path_list: Vec<String>) -> Result<()> {
     let hasher = HasherConfig::new()
         .preproc_dct()
-        .hash_alg(HashAlg::Mean)
+        .hash_alg(HashAlg::Gradient)
         .to_hasher();
     let mut file_list = cache::load_cache().unwrap_or(HashMap::new());
     for elem in path_list {
@@ -82,9 +82,7 @@ fn find_duplicates(file_list: &HashMap<String, String>) {
             for (path_j, hash_j) in &lookup {
                 if let Ok(hash2) = ImageHash::<Box<[u8]>>::from_base64(hash_j) {
                     let diff = hash1.dist(&hash2);
-                    if diff < 1 {
-                        println!("{} {} {}", path_i, path_j, diff);
-                    }
+                    println!("{} {} {}", path_i, path_j, diff);
                 } else {
                     println!("Could not read hash: {} from file {}", hash_j, path_j)
                 }

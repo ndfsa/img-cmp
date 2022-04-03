@@ -7,13 +7,9 @@ use std::{
     path::Path,
 };
 
-use img_hash::{HashAlg, Hasher, HasherConfig};
+use img_hash::Hasher;
 
-pub fn clean_cache(path_list: Vec<String>) -> Result<(), Error> {
-    let hasher = HasherConfig::new()
-        .preproc_dct()
-        .hash_alg(HashAlg::Mean)
-        .to_hasher();
+pub fn clean_cache(path_list: Vec<String>, hasher: &Hasher) -> Result<(), Error> {
     let mut file_list = load_cache().unwrap_or(HashMap::new());
     for elem in &path_list {
         cache_elem(&elem, &hasher, &mut file_list)?;

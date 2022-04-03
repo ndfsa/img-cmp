@@ -1,4 +1,4 @@
-use img_hash::{HashAlg, HasherConfig, ImageHash};
+use img_hash::{HashAlg, HasherConfig, ImageHash, Hasher};
 use sha1::Digest;
 use std::{
     collections::HashMap,
@@ -27,17 +27,14 @@ fn parse_cmd(cmd: &str, path_list: Vec<String>) -> Result<()> {
             }
         }
         "run" => run(path_list)?,
-        "cache" => cache::clean_cache(path_list)?,
+        "cache" => cache::clean_cache(path_list, &build_hasher())?,
         _ => panic!("Unknown command {}", cmd),
     }
     Ok(())
 }
 
 fn run(path_list: Vec<String>) -> Result<()> {
-    let hasher = HasherConfig::new()
-        .preproc_dct()
-        .hash_alg(HashAlg::Gradient)
-        .to_hasher();
+    let hasher = build_hasher();
     let mut file_list = cache::load_cache().unwrap_or(HashMap::new());
     for elem in path_list {
         cache::cache_elem(&elem, &hasher, &mut file_list)?;
@@ -123,4 +120,12 @@ fn flatten_list(args: Vec<String>) -> Vec<String> {
         }
     }
     result
+}
+
+fn build_hasher() -> Hasher {
+    HasherConfig::new()
+        .preproc_dct()
+        .hash_size(16, 16)
+        .hash_alg(HashAlg::DoubleGradient)
+        .to_hasher()
 }

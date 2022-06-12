@@ -1,4 +1,4 @@
-use img_hash::{HashAlg, HasherConfig, ImageHash, Hasher};
+use image_hasher::{HashAlg, HasherConfig, ImageHash, Hasher};
 use sha1::Digest;
 use std::{
     collections::HashMap,

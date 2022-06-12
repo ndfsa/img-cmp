@@ -7,7 +7,7 @@ use std::{
     path::Path,
 };
 
-use img_hash::Hasher;
+use image_hasher::Hasher;
 
 pub fn clean_cache(path_list: Vec<String>, hasher: &Hasher) -> Result<(), Error> {
     let mut file_list = load_cache().unwrap_or(HashMap::new());
